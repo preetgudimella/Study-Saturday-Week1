@@ -1,0 +1,134 @@
+Node.Js
+    - Node.js enables JavaScript to interact w/ the computer
+    - Runtime environment for executing JavaScript code OUTSIDE our browser
+    - Often use Node to build back-end services (ie Application Promgramming Interfaces (APIs))
+        - These power client applications (eg Web app that runs on a web broswer, Mobile app that runs on a mobile device)
+        - These are what the user sees and interacts with (ie they are just the surface)
+        - They need to talk to some services in the back-end service that sit in a server or in the cloud to store data, send email, or push notification, kick off work flows, etc
+    - Not a...
+        - Programming language
+        - Not a framework
+    - Pros
+        - Great for prototyping an agile development
+        - Superfast and highly scalable
+        - JavaScript everywhere
+        - Cleaner and more consistent codebase (since can use JavaScript in both back-end and front-end -> same conventions, same naming tools, etc)
+        - Large ecosystem of open-source libraries
+    - Is asynchronous -> node applications are asynchronous by default
+    - IS ideal for Input/Output-intensive apps
+    - SHOULDN'T be used for CPU-intensive apps
+
+Before Node.Js
+    - Used to run applications in our browser -> browser has a JS engine -> converts our JS code to convert it to a language that our computer can understand
+    - 
+
+Express
+    - Library
+    - Express helps our Node application respond to HTTP requests
+
+HTTP requests by the CLIENT to perform an action on the server side
+    - .get
+        - Used for GETTING something that exists
+    - .put
+        - Used for UPDATING something that exists
+    - .delete
+        - Used for DELETING something that exists
+    - .post
+        - Used for CREATING something new
+
+require(X)
+    - IMports the entire object
+    - eg for express, todos, morgan
+
+export.modules = X;
+    - EXports the entire object
+
+Traversing file paths
+    - .. means go 1 level up in the file path -> can then navigate to the folder containing the file of interest
+    - .  means to looks in the same folder -> can then navigate to the file of interest
+
+    req = {
+        params: {
+            name: 'joe'
+        }
+    }
+
+Static files
+    - Files that clients download as they are from the server
+    - Create a new directory, public
+    - Express, by default DOESN'T allow you to serve static fileS
+    - You need to enable it using the following built-in middleware
+        - app.use(express.static('public'));
+req.body
+    - Contains key-value pairs of data submitted in the request body
+    - By default, it is undefined, and is populated when you use body-parsing middleware such as body-parser and multer
+    - How to use body-parsing middleware to populate req.body
+        var app = require('express')();
+        var bodyParser = require('body-parser');
+        var multer = require('multer'); // v1.0.5
+        var upload = multer(); // for parsing multipart/form-data
+
+        app.use(bodyParser.json()); // for parsing application/json
+        app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+        app.post('/profile', upload.array(), function (req, res, next) {
+            console.log(req.body);
+            res.json(req.body);
+        });
+
+req.params
+    - This property is an object containing properties mapped to the named route “parameters”
+    - For example, if you have the route /user/:name, then the “name” property is available as req.params.name
+    - This object defaults to {}
+
+req.query
+    - This property is an object containing a property for each query string parameter in the route
+    - If there is no query string, it is the empty object, {}
+    - GET /search?q=tobi+ferret
+        req.query.q             // "tobi ferret"
+    - GET /shoes?order=desc&shoe[color]=blue&shoe[type]=converse
+        req.query.order         // "desc"
+        req.query.shoe.color    // "blue"
+        req.query.shoe.type     // "converse"
+
+res.json([body])
+    - Sends a JSON response
+    - This method sends a response (with the correct content-type) that is the parameter converted to a JSON string using JSON.stringify()
+    - The parameter can be any JSON type, including object, array, string, Boolean, or number, and you can also use it to convert other values to JSON, such as null, and undefined (although these are technically not valid JSON)
+    - res.json(null);
+    - res.json({ user: 'tobi' });
+    - res.status(500).json({ error: 'message' });
+
+res.send([body])
+    - Sends the HTTP response
+        - The body parameter can be a Buffer object, a String, an object, or an Array. For example:
+            res.send(new Buffer('whoop'));
+            res.send({ some: 'json' });
+            res.send('<p>some html</p>');
+            res.status(404).send('Sorry, we cannot find that!');
+            res.status(500).send({ error: 'something blew up' });
+    - This method performs many useful tasks for simple non-streaming responses: For example, it automatically assigns the Content-Length HTTP response header field (unless previously defined) and provides automatic HEAD and HTTP cache freshness support
+    - When the parameter is a Buffer object, the method sets the Content-Type response header field to “application/octet-stream”, unless previously defined as shown below:
+        res.set('Content-Type', 'text/html');
+        res.send(new Buffer('<p>some html</p>'));
+    - When the parameter is a String, the method sets the Content-Type to “text/html”:
+        res.send('<p>some html</p>');
+    - When the parameter is an Array or Object, Express responds with the JSON representation:
+        res.send({ user: 'tobi' });
+        res.send([1,2,3]);
+
+middleware
+    - intercepts requests before a response is sent
+    - logging middleware
+        - eg Morgan - intercepts requests
+        - analogous to a console.log
+
+app.use
+    - Mounts the specified middleware function or functions at the specified path: the middleware function is executed when the base of the requested path matches path
+    - A route will match any path that follows its path immediately with a “/”. For example: app.use('/apple', ...) will match “/apple”, “/apple/images”, “/apple/images/news”, and so on
+    - Since path defaults to “/”, middleware mounted without a path will be executed for every request to the app.
+    - For example, this middleware function will be executed for every request to the app:
+        app.use(function (req, res, next) {
+            console.log('Time: %d', Date.now());
+            next();
+        });
